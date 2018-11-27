@@ -17,6 +17,9 @@ for image in $curlimage $jqimage; do
 done
 
 # stop here for rodeo
+sudo sed -i 's/Port 22/Port 2222/g' /etc/ssh/sshd_config
+sudo service ssh reload
+sudo service ssh restart
 exit 0
 
 while true; do
