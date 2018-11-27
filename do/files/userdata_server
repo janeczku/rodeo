@@ -16,6 +16,9 @@ for image in $curlimage $jqimage "rancher/rancher:${rancher_version}"; do
 done
 
 # stop here for rodeo
+sudo sed -i 's/Port 22/Port 2222/g' /etc/ssh/sshd_config
+sudo service ssh reload
+sudo service ssh restart
 exit 0
 
 docker run -d --restart=unless-stopped -p 80:80 -p 443:443 -v /root/rancher:/var/lib/rancher rancher/rancher:${rancher_version}
