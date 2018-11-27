@@ -1,10 +1,20 @@
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
+kind: Namespace
+apiVersion: v1
 metadata:
-  name: managed-nfs-storage
-  annotations:
-    storageclass.kubernetes.io/is-default-class: "true"
-provisioner: fuseim.pri/ifs # or choose another name, must match deployment's env PROVISIONER_NAME'
+  name: nfs-client-provisioner
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: nfs-client-provisioner
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: nfs-client-provisioner
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
 ---
 kind: Deployment
 apiVersion: extensions/v1beta1
@@ -30,11 +40,20 @@ spec:
             - name: PROVISIONER_NAME
               value: fuseim.pri/ifs
             - name: NFS_SERVER
-              value: 172.22.101.101
+              value: 54.191.22.155
             - name: NFS_PATH
               value: /
       volumes:
         - name: nfs-client-root
           nfs:
-            server: 172.22.101.101
+            server: 54.191.22.155
             path: /
+
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: managed-nfs-storage
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: fuseim.pri/ifs # or choose another name, must match deployment's env PROVISIONER_NAME'
